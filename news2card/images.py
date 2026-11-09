@@ -12,11 +12,15 @@ _HEADERS = {
     "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
 }
 
-# 各图床要求 Referer 与主站一致（不匹配会 403）；不在表中的图床不带 Referer
+# 各图床要求 Referer 与主站一致（不匹配会 403 或返回假图）；不在表中的图床不带 Referer
 _REFERER_BY_HOST = {
     "zbstatic": "https://www.zaobao.com/",
     "thepaper.cn": "https://www.thepaper.cn/",
+    "qpic.cn": "https://mp.weixin.qq.com/",
 }
+
+# 小于该字节的图片视为防盗链占位假图（如 qpic 跨站 Referer 返回的 ~2KB 假 200）
+_MIN_IMAGE_BYTES = 2048
 
 
 def _headers_for(url: str) -> dict:
@@ -38,6 +42,9 @@ def download_image(url: str, timeout: int = 20, retries: int = 2) -> bytes:
         try:
             resp = requests.get(url, headers=_headers_for(url), timeout=timeout)
             resp.raise_for_status()
+            if len(resp.content) < _MIN_IMAGE_BYTES:
+                raise ValueError(
+                    f"图片仅 {len(resp.content)}B，疑似防盗链占位假图: {url[:60]}")
             return resp.content
         except requests.RequestException as e:
             last_err = e

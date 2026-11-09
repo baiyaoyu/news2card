@@ -17,6 +17,7 @@ _FONT = '"WenQuanYi Micro Hei","AR PL UMing CN",sans-serif'
 _PDF_ACCENTS = {
     "zaobao": ("#b4001e", "#faf6ef"),
     "thepaper": ("#175ce5", "#f0f5ff"),
+    "wechat": ("#07c160", "#f0faf4"),
 }
 _PDF_ACCENT_DEFAULT = ("#333a45", "#f5f6f8")
 
@@ -36,7 +37,7 @@ _ORIGIN_MARKS = {
     "客户端AI": "要点由客户端 AI 生成",
     "页面摘要": "摘要来自联合早报 · AI 辅助生成",
     "提取式": "要点摘自原文",
-    "站点摘要": "摘自原文导语",
+    "站点摘要": "摘要来自来源站点",
     "导语": "摘自原文导语",
 }
 
@@ -186,7 +187,7 @@ def build_article_html(article: Article, hero_datauri: str,
                        generated_at: Optional[str] = None) -> str:
     generated_at = generated_at or datetime.now().strftime("%Y-%m-%d %H:%M")
     accent, accent_bg = _pdf_accent(article.source_id)
-    summary_label = "AI 摘要" if article.source_id == "zaobao" else "摘要"
+    summary_label = "摘要"
 
     def render_blocks() -> str:
         out = []

@@ -2,13 +2,14 @@
 
 from typing import List, Tuple
 
-from . import extract_zaobao, extract_thepaper
+from . import extract_zaobao, extract_thepaper, extract_wechat
 from .extract_zaobao import ExtractError
 
 # 按优先级匹配：域名子串 → 抽取模块
 _EXTRACTORS: List[Tuple[str, object]] = [
     ("zaobao.com", extract_zaobao),
     ("thepaper.cn", extract_thepaper),
+    ("mp.weixin.qq.com", extract_wechat),
 ]
 
 

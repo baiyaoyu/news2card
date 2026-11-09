@@ -193,7 +193,9 @@ def resolve(article: Article, mode: str = "auto",
     mode: auto(纯代码) / ai(可调用 LLM)；llm: gemini(失败自动兜 Kimi) / kimi(只用 Kimi)。
     """
     if _usable_native(article):
-        return article.summary[:4], "页面摘要"
+        # 多条要点=页面 AI 摘要；单条长文=站点编辑摘要
+        label = "页面摘要" if len(article.summary) >= 2 else "站点摘要"
+        return article.summary[:4], label
 
     if mode == "ai":
         order = ["gemini", "kimi"] if llm == "gemini" else ["kimi"]

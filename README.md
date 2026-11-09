@@ -7,6 +7,13 @@
 |---|---|---|---|
 | 联合早报 | zaobao.com | 早报红（zaobao） | 红 |
 | 澎湃新闻 | thepaper.cn | 澎湃蓝（thepaper） | 蓝 |
+| 微信公众号 | mp.weixin.qq.com | 微信绿（wechat） | 绿 |
+
+公众号注意：
+- 文章 URL 的 query（poc_token）必须保留——抽取与二维码都基于完整 URL；过期 token 反而可能触发风控
+- 风控页自动识别（无 js_content / "环境异常"文案）并报错，不会被当成空文章
+- qpic 图床防盗链：Referer 须为 mp.weixin.qq.com，跨站返回 ~2KB 假图（200），已按主机映射 + 小于 2KB 判假
+- 公众号无站方摘要：CLI auto=提取式 / ai=LLM；MCP server 走 MRTR 由客户端生成
 
 ## 环境
 
@@ -64,7 +71,7 @@ news2card/
 
 ### 各站抽取来源
 
-**联合早报**（服务端直出）：JSON-LD NewsArticle（标题/时间/头图）+ DOM（`a.byline_area_small` 频道、`.byline_area` 署名、`更新 / ...` 时间、`<zb-ai-summary>` AI 摘要、`div.order-8 article` 正文）。
+**联合早报**（双模板并存，自动识别）：旧版 www.zaobao.com（`div.order-8` 正文、`<zb-ai-summary>` AI 摘要、`.byline_area` 署名、发布/更新行）；新版 www.zaobao.com.sg（`<article>` 正文、`#speakable-summary` 引语框、React Router 脱水状态流——逆向其引用元组格式取 teaser/stand_first/custom_byline/作者档案/频道键，AI 摘要视文章 SSR 情况而定）。两版通用：JSON-LD 标题/时间/封面（CDN cassette.sphdigital.com.sg）。
 
 **澎湃新闻**（Next.js SSR）：`__NEXT_DATA__ → contentDetail`（name/pubTime/author/summary/nodeInfo/pic）+ content HTML 按文档序解析 p/img；图注经 `images[]` 数组按 imageid 映射；视频插入占位说明。
 

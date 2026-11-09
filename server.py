@@ -177,7 +177,7 @@ async def generate_news(
         default="all", description="card=分享卡片PNG / pdf=全文PDF / all=两者"),
     size: Literal["square", "portrait", "story"] = Field(
         default="square", description="卡片尺寸：方形1080² / 竖版3:4 / 竖长9:16"),
-    style: Optional[Literal["clean", "zaobao", "thepaper", "dark"]] = Field(
+    style: Optional[Literal["clean", "zaobao", "thepaper", "wechat", "dark"]] = Field(
         default=None, description="卡片风格（缺省按站点自动匹配）"),
     ctx: Context = None,
 ) -> dict:
@@ -231,7 +231,7 @@ async def generate_news(
 
 @mcp.tool
 async def get_news_content(
-    url: str = Field(description="新闻文章链接（联合早报/澎湃新闻）"),
+    url: str = Field(description="新闻文章链接（联合早报 / 澎湃新闻 / 微信公众号）"),
     ctx: Context = None,
 ) -> dict:
     """获取新闻详情：元信息 + 全文内容（按原文块序），不生成摘要。"""

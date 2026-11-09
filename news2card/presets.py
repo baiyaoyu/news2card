@@ -38,6 +38,14 @@ CARD_STYLES = {
             "--divider": "#e8ebef", "--card-shadow": "none",
         },
     },
+    "wechat": {
+        "label": "微信绿",
+        "vars": {
+            "--bg": "#ffffff", "--fg": "#1f2329", "--muted": "#8a8f99",
+            "--accent": "#07c160", "--accent-fg": "#ffffff",
+            "--divider": "#e8eaee", "--card-shadow": "none",
+        },
+    },
     "dark": {
         "label": "暗夜黑",
         "vars": {
@@ -53,6 +61,7 @@ CARD_STYLES = {
 SITE_DEFAULT_STYLE = {
     "zaobao": "zaobao",
     "thepaper": "thepaper",
+    "wechat": "wechat",
 }
 
 DEFAULT_STYLE = "clean"
