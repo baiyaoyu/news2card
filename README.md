@@ -78,11 +78,11 @@ news2card/
 
 - **单工具** `generate_news(url, out_format, size, style)` → `{ok, title, summary_origin, files}`
 - **内容工具** `get_news_content(url)` → 元信息 + 按原文块序的全文（paragraph/image/note）+ `has_native_summary` 标记；同样走缓存与流式，不做摘要生成（澎湃的"原生摘要"为 80 字截断导语，长度由调用方自行判断）
-- **服务端零 LLM**：页面有原生摘要直接用；没有则通过 MRTR（多轮输入）协议暂停——工具体返回 `InputRequiredResult`，客户端经 elicitation 填写结构化摘要（`AiSummary: summary/source`）后自动重试恢复，工具从断点继续
+- **服务端零 LLM**：页面有像样原生摘要（早报 AI 要点）直接用；摘要缺失或过短（如澎湃的 80 字截断导语，判定标准与 CLI 摘要级联一致）则通过 MRTR（多轮输入）协议暂停——工具体返回 `InputRequiredResult` 内嵌 `CreateMessageRequest`（sampling），由客户端 LLM 基于正文就地生成摘要（正文已嵌入提示词，无需再调工具），`model` 记为摘要来源；文章无可用封面（页面无头图或下载失败）时同样经 MRTR 返回 `ElicitRequest` 表单，由用户填写封面 URL（留空按无封面渲染），客户端履行后自动重试，工具从断点继续
 - **断点零重复劳动**：SQLite（`news2card_cache.db`，WAL）缓存三类阶段产物——文章解析、图片下载、渲染文件；恢复轮/重复调用全部命中缓存
 - **流式进度**：处理信息经 `ctx.info` / `ctx.report_progress` 实时推送客户端，服务端不本地打印
 - **文件返回三通道**：工具结果内嵌卡片 PNG 为 `ImageContent`（客户端 LLM 直接可视）；结构化输出含 `downloads` 列表；二进制真流式走自定义路由 `GET /files/{filename}`（FileResponse 分块传输，带目录穿越防护）。PDF 等大文件请走下载 URL，不经 JSON/base64
-- **客户端要求**：必须支持 2026-07-28 协商 + elicitation（FastMCP Client 侧注册 `elicitation_handler` 即可，框架自动驱动多轮往返）
+- **客户端要求**：必须支持 2026-07-28 协商 + sampling 履行 + elicitation（FastMCP Client 侧注册 `sampling_handler` / `elicitation_handler` 即可，框架自动驱动多轮往返）
 
 ## 摘要级联（`--summary`）
 
